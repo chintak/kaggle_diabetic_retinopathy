@@ -82,6 +82,8 @@ img_dir = sys.argv[3]
 print "Using %s as the %s directory" % (img_dir, dataset)
 
 # Get ids of imgs in directory.
+
+
 def get_img_ids(img_dir):
     test_files = list(set(glob.glob(os.path.join(img_dir, "*.jpeg"))))
     test_ids = []
@@ -247,7 +249,8 @@ print outputs.shape
 
 np.save(target_path, np.concatenate([test_names, outputs], axis=1))
 print "  Outputs saved to %s.\n" % target_path
-
+for name, level in zip(test_names, np.argmax(outputs, axis=1)):
+    print "Predicted: %s, %d" % (name, level)
 
 do_subm = int(sys.argv[4])
 if do_subm:
