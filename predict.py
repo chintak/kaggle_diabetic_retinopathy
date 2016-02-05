@@ -72,12 +72,14 @@ if sys.argv[2] == 'all_train':
     # correct splits
     dataset = 'all_train'
 
-    img_dir = prefix_path + 'train_ds2_crop/'
+    # img_dir = prefix_path + 'train_ds2_crop/'
 elif sys.argv[2] == 'test':
     # Test.
     dataset = 'test'
-    img_dir = prefix_path + 'test_ds2_crop/'
+    # img_dir = prefix_path + 'test_ds2_crop/'
 
+img_dir = sys.argv[3]
+print "Using %s as the %s directory" % (img_dir, dataset)
 
 # Get ids of imgs in directory.
 def get_img_ids(img_dir):
@@ -160,11 +162,11 @@ def do_pred(test_gen):
     return np.vstack(outputs)
 
 
-if len(sys.argv) > 4:
+if len(sys.argv) > 5:
     # Doing TTA.
-    tta_transfos = sys.argv[4]
-    tta_times = int(sys.argv[5])
-    tta_ensemble_method = sys.argv[6]
+    tta_transfos = sys.argv[5]
+    tta_times = int(sys.argv[6])
+    tta_ensemble_method = sys.argv[7]
 
     print "Doing %s TTA %i times ...\n\n" % (tta_transfos, tta_times)
 
@@ -247,7 +249,7 @@ np.save(target_path, np.concatenate([test_names, outputs], axis=1))
 print "  Outputs saved to %s.\n" % target_path
 
 
-do_subm = int(sys.argv[3])
+do_subm = int(sys.argv[4])
 if do_subm:
     subm = p.DataFrame(test_names, columns=['image'])
     subm['level'] = np.argmax(outputs, axis=1)
