@@ -149,14 +149,13 @@ def predicter():
 
     outputs = do_pred(test_gen)
 
-    test_names = np.vstack([map(lambda x: str(x), img_ids)]).T
+    test_names = np.asarray(img_ids)
     test_names = test_names.reshape((-1, 1))
-
     outputs = outputs[::2, :]
-    levels = np.argmax(outputs, axis=1)
-    for name, level in zip(test_names, levels):
-        print "Predicted: %s, %d" % (name, level)
-    return outputs
+    preds = dict(map(lambda x, y: ('%d' % (x), list(y)), test_names, outputs))
+    for name, level in preds.iteritems():
+        print "Predicted: %s," % (name), level
+    return preds
 
 print '#1'
 predicter()
