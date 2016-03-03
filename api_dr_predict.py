@@ -12,6 +12,8 @@ import pandas as p
 import lasagne as nn
 
 from utils import hms, architecture_string
+import models.basic_model as model
+
 
 # 0: dump .pkl file
 # 1: dataset (all_train, test)
@@ -20,18 +22,20 @@ from utils import hms, architecture_string
 # 4: tta_times (number of TTA runs)
 # 5: tta_ensemble_method (mean, log_mean, etc.)
 
-dump_path = 'dumps/2015_07_17_123003.pkl'
-model_data = pickle.load(open(dump_path, 'r'))
+extras_dump_path = 'dumps/2015_07_17_123003_EXTRAS.pkl'
+params_dump_path = 'dumps/2015_07_17_123003_PARAMSDUMP.pkl'
+model_data = pickle.load(open(extras_dump_path, 'r'))
+param_model_data = pickle.load(open(params_dump_path, 'r'))
+l_out, l_ins = model.build_model()
+nn.layers.set_all_param_values(l_out, param_model_data)
 
+print "Model loaded"
 
 def predicter():
-    global model_data
+    global model_data, l_out, l_ins
     # Setting some vars for easier ref.
     chunk_size = model_data['chunk_size'] * 2
     batch_size = model_data['batch_size']
-
-    l_out = model_data['l_out']
-    l_ins = model_data['l_ins']
 
     # Print some basic stuff about the model.
     num_params = nn.layers.count_params(l_out)
@@ -63,7 +67,7 @@ def predicter():
     )
 
     dataset = 'test'
-    img_dir = '/media/shared/dr/'
+    img_dir = '/home/ubuntu/dataset/kaggle_diabetic_retinopathy/data/'
     print "Using %s as the %s directory" % (img_dir, dataset)
 
     # Get ids of imgs in directory.
@@ -105,13 +109,8 @@ def predicter():
 
     num_chunks = int(np.ceil((2 * len(img_ids)) / float(chunk_size)))
 
-    if 'data_loader_no_transfos' in model_data:
-        no_transfo_params = model_data['data_loader_no_transfos']
-        default_transfo_params = model_data[
-            'data_loader_default_transfo_params']
-    else:
-        no_transfo_params = data_loader.no_transfo_params
-        default_transfo_params = data_loader.default_transfo_params
+    no_transfo_params = data_loader.no_transfo_params
+    default_transfo_params = data_loader.default_transfo_params
 
     # The default gen with "no transfos".
     test_gen = lambda: data_loader.create_fixed_gen(
@@ -159,7 +158,10 @@ def predicter():
 
 print '#1'
 predicter()
-print '#2'
-predicter()
-print '#3'
-predicter()
+# print '#2'
+# predicter()
+# print '#3'
+# predicter()
+# Predicted: 12149, [8.8617635e-06, 4.4732293e-05, 0.041340578, 0.2897495, 0.66885638]
+# Predicted: 34512, [0.81459552, 0.1631396, 0.022102561, 0.00014822419, 1.3947971e-05]
+
